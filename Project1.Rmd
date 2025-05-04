@@ -1,0 +1,48 @@
+---
+title: "Project 1"
+author: "Ethan Hoang"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Function
+
+```{r}
+ntickets <- function(N = 200, gamma = .02, p = .95) {
+  
+  nxd <- seq(from=N, to=N*1.1, by=1)
+  y <- 1-gamma-pbinom(N,nxd,p)
+  nd <- nxd[which.min(abs(y))]
+  secondLine= paste0("(",nd,")"," gamma=",gamma," N=",N," discrete")
+  plot(nxd, y, type = "b", main =c(paste("Objective vs n to find optimal tickets sold discrete"),secondLine), xlab = "n", ylab = "Objective",col="blue")
+  abline(h=0, col="red")
+  abline(v=nd,col="red")
+  
+  
+  nxc <- seq(from=N, to=N*1.1,by=0.0001)
+  yc <- 1-gamma-pnorm(nxc,nxc*p,sqrt(nxc*p*(1-p)))
+  f <- function(x) abs((1-gamma-pnorm(N+0.5,x*p,sqrt(x*p*(1-p)))))
+  optum<-optimise(f,nxc)
+  nc <- optum$minimum
+  secondLine=paste0("(",nc,")"," gamma=",gamma," N=",N," continous")
+  curve(1-gamma-pnorm(N+0.5,x*p,sqrt(x*p*(1-p))),from=N, to=N*1.1, xlab="n",ylab="Objective",main=c("Objective vc n to find optimal tickets sold continuous",secondLine))
+  abline(h=0, col="blue")
+  abline(v=nc,col="blue")
+  returnList <- list(nd=nd, nc=nc, N=N, p=p, gamma=gamma)
+  returnList
+}
+```
+
+## Test Case
+
+```{r}
+ntickets(N=400,gamma=0.02,p=0.95)
+```
+
